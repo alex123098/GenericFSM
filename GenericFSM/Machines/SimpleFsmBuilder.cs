@@ -4,12 +4,20 @@ using GenericFSM.Exceptions;
 
 namespace GenericFSM.Machines
 {
-	public class SimpleFsmBuilder<TState> : FsmBuilder<TState> where TState: struct
+	public class SimpleFsmBuilder<TState, TCommand> : FsmBuilder<TState, TCommand>
+		where TState : struct
+		where TCommand : struct
 	{
-		private readonly Dictionary<TState, StateConfiguration> _stateConfigurations = new Dictionary<TState, StateConfiguration>(); 
+		private readonly Dictionary<TState, StateConfiguration> _stateConfigurations = new Dictionary<TState, StateConfiguration>();
 
-		public override void CreateStateMachine() {
-			throw new InvalidFsmConfigurationException();
+		public override StateMachine<TState, TCommand> CreateStateMachine() {
+			if (_stateConfigurations.Count == 0) {
+				throw new InvalidFsmConfigurationException("There's no states configured.");
+			}
+			if (_initialConfiguration == null) {
+				throw new InvalidFsmConfigurationException("Initial state was not configured.");
+			}
+			return new SimplePassiveStateMachine<TState, TCommand>();
 		}
 
 		public override StateConfiguration FromState(TState state) {

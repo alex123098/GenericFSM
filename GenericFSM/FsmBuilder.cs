@@ -4,18 +4,32 @@ using GenericFSM.Exceptions;
 
 namespace GenericFSM
 {
-	[ContractClass(typeof(FsmBuilderContract<>))]
-	public abstract partial class FsmBuilder<TState> where TState : struct
+	[ContractClass(typeof(FsmBuilderContract<,>))]
+	public abstract partial class FsmBuilder<TState, TCommand> 
+		where TState   : struct 
+		where TCommand : struct
 	{
-		private StateConfiguration _initialConfiguration;
+		protected StateConfiguration _initialConfiguration;
 
 		protected FsmBuilder() {
 			if (!typeof(TState).IsEnum) {
 				throw new InvalidStateTypeException();
 			}
+			if (!typeof(TCommand).IsEnum) {
+				throw new InvalidCommandTypeException();
+			}
 		} 
 
-		public abstract void CreateStateMachine();
+		public abstract StateMachine<TState, TCommand> CreateStateMachine();
+
+		public virtual StateMachine<TState, TCommand> CreateStateMachine(bool createStarted) {
+			Contract.Ensures(Contract.Result<StateMachine<TState, TCommand>>() != null);
+			var machine = CreateStateMachine();
+			if (createStarted) {
+				machine.Start();
+			}
+			return machine;
+		}
 
 		public abstract StateConfiguration FromState(TState state);
 
@@ -29,14 +43,17 @@ namespace GenericFSM
 		}
 	}
 
-	[ContractClassFor(typeof(FsmBuilder<>))]
-	public abstract class FsmBuilderContract<T> : FsmBuilder<T> where T:struct 
+	[ContractClassFor(typeof(FsmBuilder<,>))]
+	public abstract class FsmBuilderContract<T1,T2> : FsmBuilder<T1,T2> 
+		where T1 : struct 
+		where T2 : struct
 	{
-		public override void CreateStateMachine() {
+		public override StateMachine<T1, T2> CreateStateMachine() {
+			Contract.Ensures(Contract.Result<StateMachine<T1, T2>>() != null);
 			throw new NotImplementedException();
 		}
 
-		public override StateConfiguration FromState(T state) {
+		public override StateConfiguration FromState(T1 state) {
 			Contract.Ensures(Contract.Result<StateConfiguration>() != null);
 			throw new NotImplementedException();
 		}

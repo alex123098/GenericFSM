@@ -9,19 +9,24 @@ namespace GenericFSM.Tests.Unit
 	{
 		[Fact]
 		public void UnableToCreateStateMachine_WithoutConfiguration() {
-			FsmBuilder<TrafficLightState> fsmBuilder = new SimpleFsmBuilder<TrafficLightState>();
+			var fsmBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
 			
 			Assert.Throws<InvalidFsmConfigurationException>(() => fsmBuilder.CreateStateMachine());
 		}
 
 		[Fact]
 		public void Ctor_WillThrowIfStateTypeIsNotEnum() {
-			Assert.Throws<InvalidStateTypeException>(() => new SimpleFsmBuilder<int>());
+			Assert.Throws<InvalidStateTypeException>(() => new SimpleFsmBuilder<int, TrafficLightCommand>());
 		}
 
 		[Fact]
+		public void Ctor_WillThrowIfCommandTypeIsNotEnum() {
+			Assert.Throws<InvalidCommandTypeException>(() => new SimpleFsmBuilder<TrafficLightState, int>());
+		}
+		
+		[Fact]
 		public void FromState_WillReturnStateConfiguration() {
-			FsmBuilder<TrafficLightState> fsmBuilder = new SimpleFsmBuilder<TrafficLightState>();
+			var fsmBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
 
 			var stateConfiguration = fsmBuilder.FromState(TrafficLightState.Green);
 
@@ -30,7 +35,7 @@ namespace GenericFSM.Tests.Unit
 
 		[Fact]
 		public void WillThrowOnAttemptToSetInitialStateTwice() {
-			FsmBuilder<TrafficLightState> fsmBuilder = new SimpleFsmBuilder<TrafficLightState>();
+			var fsmBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
 
 			fsmBuilder.FromState(TrafficLightState.Green).AsInitialState();
 			
@@ -39,7 +44,7 @@ namespace GenericFSM.Tests.Unit
 
 		[Fact]
 		public void FromState_WillReturnOneConfigurationForEachPossibleState() {
-			FsmBuilder<TrafficLightState> fsmBuilder = new SimpleFsmBuilder<TrafficLightState>();
+			var fsmBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
 
 			var stateConfig1 = fsmBuilder.FromState(TrafficLightState.Green);
 			var stateConfig2 = fsmBuilder.FromState(TrafficLightState.Green);

@@ -84,11 +84,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\CommandConfiguration.cs" />
+    <Compile Include="Configuration\CommandObject.cs" />
+    <Compile Include="Configuration\StateObject.cs" />
     <Compile Include="Configuration\StateConfiguration.cs" />
+    <Compile Include="Exceptions\CommandRegistrationException.cs" />
+    <Compile Include="Exceptions\InvalidCommandTypeException.cs" />
     <Compile Include="Exceptions\InvalidFsmConfigurationException.cs" />
     <Compile Include="Exceptions\InvalidStateTypeException.cs" />
     <Compile Include="FsmBuilder.cs" />
+    <Compile Include="StateMachine.cs" />
     <Compile Include="Machines\SimpleFsmBuilder.cs" />
+    <Compile Include="Machines\SimplePassiveStateMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
