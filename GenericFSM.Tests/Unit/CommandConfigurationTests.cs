@@ -59,5 +59,34 @@ namespace GenericFSM.Tests.Unit
 			Assert.NotNull(stateConfig);
 			Mock.Get(fsmStub).Verify();
 		}
+
+		[Theory]
+		[InlineData(TrafficLightCommand.Reset, TrafficLightState.Green)]
+		[InlineData(TrafficLightCommand.Reset, TrafficLightState.Red)]
+		[InlineData(TrafficLightCommand.SwitchNext, TrafficLightState.Green)]
+		[InlineData(TrafficLightCommand.SwitchNext, TrafficLightState.Yellow)]
+		public void CreateCommandObject_WillCreateAppropriateCommandObject(TrafficLightCommand command, TrafficLightState state) {
+			var fsmStub = Mock.Of<FsmBuilder<TrafficLightState, TrafficLightCommand>>();
+			var finiteState = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>()
+				.ForState(state)
+				.WithFsmBuilder(fsmStub)
+				.Build();
+			Mock.Get(fsmStub)
+				.Setup(builder => builder.FromState(state))
+				.Returns(finiteState);
+			var commandConfigBuilder = new TestCommandConfigurationBuilder<TrafficLightState, TrafficLightCommand>();
+			commandConfigBuilder
+				.State
+				.WithFsmBuilder(fsmStub);
+			var commandConfig = commandConfigBuilder
+				.WithCommand(command)
+				.Build();
+			commandConfig.SetState(state);
+
+			var commandObject = commandConfig.CreateCommandObject();
+
+			Assert.Equal(command, commandObject.Command);
+			Assert.Equal(state, commandObject.TargetState);
+		}
 	}
 }

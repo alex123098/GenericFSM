@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using GenericFSM.Tests.Infrastructure;
 using Xunit;
 using Xunit.Extensions;

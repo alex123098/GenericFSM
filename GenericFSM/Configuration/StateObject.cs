@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace GenericFSM
 {
@@ -35,6 +36,10 @@ namespace GenericFSM
 				if (_exitAction != null) {
 					_exitAction();
 				}
+			}
+
+			public static implicit operator TState(StateObject stateObject) {
+				return stateObject.State;
 			}
 		}
 	}

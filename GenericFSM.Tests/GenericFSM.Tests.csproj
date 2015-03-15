@@ -55,9 +55,11 @@
     <Compile Include="Infrastructure\TestStateConfigurationBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\CommandConfigurationTests.cs" />
+    <Compile Include="Unit\CommandObjectTests.cs" />
     <Compile Include="Unit\SimpeStateMachineTests.cs" />
     <Compile Include="Unit\SimpleFsmBuilderTests.cs" />
     <Compile Include="Unit\StateConfigurationTests.cs" />
+    <Compile Include="Unit\StateObjectTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

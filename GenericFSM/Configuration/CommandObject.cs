@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GenericFSM
 {
@@ -30,8 +26,15 @@ namespace GenericFSM
 				_targetState = targetState;
 			}
 
+			public TCommand Command { get { return _command; } }
+			public StateObject TargetState { get { return _targetState; } }
+
 			public override int GetHashCode() {
-				return Command.GetHashCode(_command, _guardCondition);
+				return GenericFSM.Command.GetHashCode(_command, _guardCondition);
+			}
+
+			public static implicit operator TCommand(CommandObject commandObject) {
+				return commandObject.Command;
 			}
 		}
 	}
