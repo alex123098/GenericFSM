@@ -3,8 +3,8 @@
 namespace GenericFSM.Tests.Infrastructure
 {
 	internal class TestCommandConfigurationBuilder<TState, TCommand>
-		where TState:struct 
-		where TCommand:struct 
+		where TState : struct, IComparable, IConvertible, IFormattable
+		where TCommand : struct, IComparable, IConvertible, IFormattable
 	{
 		private readonly TestStateConfigurationBuilder<TState, TCommand> _stateConfigurationBuilder = new TestStateConfigurationBuilder<TState, TCommand>();
 		private Func<bool> _guardCondition;

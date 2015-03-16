@@ -1,10 +1,11 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 
 namespace GenericFSM.Tests.Infrastructure
 {
 	internal class TestStateConfigurationBuilder<TState, TCommand>
-		where TState: struct 
-		where TCommand: struct
+		where TState : struct, IComparable, IConvertible, IFormattable
+		where TCommand : struct, IComparable, IConvertible, IFormattable
 	{
 		private FsmBuilder<TState, TCommand> _fsmBuilder;
 		private TState _state;

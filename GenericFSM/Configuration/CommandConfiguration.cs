@@ -14,6 +14,7 @@ namespace GenericFSM
 			private readonly Func<bool> _guardCondition;
 			private readonly StateConfiguration _fromStateConfiguration;
 			private StateConfiguration _targetStateConfiguration;
+			private StateMachine<TState, TCommand>.CommandObject _cachedCommandObject;
 
 			#endregion
 			
@@ -43,13 +44,17 @@ namespace GenericFSM
 			}
 
 			internal Func<bool> GuardCondition {
+				[Pure]
 				get { return _guardCondition; }
 			}
 
 			internal StateMachine<TState, TCommand>.CommandObject CreateCommandObject() {
 				Contract.Assume(_targetStateConfiguration != null);
-
-				return new StateMachine<TState, TCommand>.CommandObject(_command, _guardCondition, _targetStateConfiguration.CreateState());
+				return _cachedCommandObject ?? 
+					  (_cachedCommandObject = new StateMachine<TState, TCommand>.CommandObject(
+						_command,
+						_guardCondition,
+						_targetStateConfiguration.CreateState()));
 			}
 
 			#endregion
@@ -60,7 +65,7 @@ namespace GenericFSM
 				Contract.Ensures(Contract.Result<StateConfiguration>() != null);
 
 				_targetStateConfiguration = _fromStateConfiguration.GetFsmBuilder().FromState(state);
-				return _targetStateConfiguration;
+				return _fromStateConfiguration;
 			}
 
 			#endregion

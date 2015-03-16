@@ -3,6 +3,7 @@ using GenericFSM.Machines;
 using GenericFSM.Tests.Infrastructure;
 using Moq;
 using Xunit;
+using Xunit.Extensions;
 
 namespace GenericFSM.Tests.Behaviour
 {
@@ -52,6 +53,58 @@ namespace GenericFSM.Tests.Behaviour
 			
 			Assert.NotNull(stateMachine);
 			Mock.Get(stateMachine).Verify(sm => sm.Start());
+		}
+
+		[Theory]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Yellow)]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red)]
+		[InlineData(TrafficLightState.Yellow, TrafficLightCommand.SwitchNext, TrafficLightState.Red)]
+		[InlineData(TrafficLightState.Yellow, TrafficLightCommand.Reset, TrafficLightState.Green)]
+		public void StateMachineConfiguredForTwoStatesWillLeadToFinalState(
+			TrafficLightState initialState, 
+			TrafficLightCommand command, 
+			TrafficLightState finalState) {
+
+			var stateMachineBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
+			stateMachineBuilder
+				.FromState(initialState)
+				.AsInitialState()
+				.OnCommand(command)
+				.SetState(finalState);
+
+			var stateMachine = stateMachineBuilder.CreateStateMachine(true);
+			Assert.Equal(initialState, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(command);
+
+			Assert.Equal(finalState, stateMachine.CurrentState);
+		}
+
+		[Theory]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red, TrafficLightState.Yellow)]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Yellow, TrafficLightState.Red)]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.Reset, TrafficLightState.Red, TrafficLightState.Yellow)]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red, TrafficLightState.Yellow)]
+		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red, TrafficLightState.Yellow)]
+		public void StateMachineConfiguredForTwoStatesWithGuardedCommandsWillSelectCorrectFinalState(
+			TrafficLightState initialState, 
+			TrafficLightCommand command,
+			TrafficLightState stateToSkip,
+			TrafficLightState stateToSet) {
+
+			var stateMachineBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
+			stateMachineBuilder
+				.FromState(initialState)
+				.AsInitialState()
+				.OnCommand(command, () => false)
+				.SetState(stateToSkip)
+				.OnCommand(command, () => true)
+				.SetState(stateToSet);
+			var stateMachine = stateMachineBuilder.CreateStateMachine(true);
+
+			Assert.Equal(initialState, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(command);
+
+			Assert.Equal(stateToSet, stateMachine.CurrentState);
 		}
 	}
 }

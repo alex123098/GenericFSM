@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Behaviour\SimpleFsmBuilderTests.cs" />
     <Compile Include="Infrastructure\Command.cs" />
+    <Compile Include="Infrastructure\EnumerableExtensions.cs" />
     <Compile Include="Infrastructure\States.cs" />
     <Compile Include="Infrastructure\TestCommandConfigurationBuilder.cs" />
     <Compile Include="Infrastructure\TestStateConfigurationBuilder.cs" />

@@ -201,5 +201,15 @@ namespace GenericFSM.Tests.Unit
 			var expectedCommand = stateObject.Commands.Single();
 			Assert.Equal(Command.GetHashCode(command), expectedCommand.GetHashCode());
 		}
+
+		[Fact]
+		public void CreateState_WillReuseCreatedStateObject() {
+			var stateConfiguration = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>()
+				.Build();
+			
+			var stateObject = stateConfiguration.CreateState();
+
+			Assert.Same(stateObject, stateConfiguration.CreateState());
+		}
 	}
 }

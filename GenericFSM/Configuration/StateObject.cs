@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Net;
 
 namespace GenericFSM
@@ -14,7 +16,13 @@ namespace GenericFSM
 			private readonly List<CommandObject> _commands = new List<CommandObject>(); 
 
 			public TState State { get { return _state; } }
-			public IEnumerable<CommandObject> Commands { get { return _commands; } }
+
+			public IEnumerable<CommandObject> Commands {
+				get {
+					Contract.Ensures(Contract.Result<IEnumerable<CommandObject>>() != null);
+					return _commands;
+				}
+			}
 
 			internal StateObject(TState state, Action enterAction, Action exitAction) {
 				_state = state;
@@ -23,6 +31,7 @@ namespace GenericFSM
 			}
 
 			internal void FillCommands(IEnumerable<CommandObject> commands) {
+				Contract.Requires<ArgumentNullException>(commands != null);
 				_commands.AddRange(commands);
 			}
 
@@ -38,8 +47,18 @@ namespace GenericFSM
 				}
 			}
 
+			public CommandObject FindCommand(TCommand command) {
+				return _commands.FirstOrDefault(cmd => cmd.Command.CompareTo(command) == 0 && cmd.CheckGuard());
+			}
+
 			public static implicit operator TState(StateObject stateObject) {
+				Contract.Requires<ArgumentNullException>(stateObject != null);
 				return stateObject.State;
+			}
+
+			[ContractInvariantMethod]
+			private void ContractInvariants() {
+				Contract.Invariant(_commands != null);
 			}
 		}
 	}

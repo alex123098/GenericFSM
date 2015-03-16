@@ -5,11 +5,11 @@ using GenericFSM.Exceptions;
 namespace GenericFSM
 {
 	[ContractClass(typeof(FsmBuilderContract<,>))]
-	public abstract partial class FsmBuilder<TState, TCommand> 
-		where TState   : struct 
-		where TCommand : struct
+	public abstract partial class FsmBuilder<TState, TCommand>
+		where TState : struct, IComparable, IConvertible, IFormattable
+		where TCommand : struct, IComparable, IConvertible, IFormattable
 	{
-		protected StateConfiguration _initialConfiguration;
+		protected StateConfiguration _initialStateConfiguration;
 
 		protected FsmBuilder() {
 			if (!typeof(TState).IsEnum) {
@@ -35,18 +35,18 @@ namespace GenericFSM
 
 		protected virtual void SetInitialStateConfiguration(StateConfiguration configuration) {
 			Contract.Requires<ArgumentNullException>(configuration != null);
-			if (_initialConfiguration != null) {
+			if (_initialStateConfiguration != null) {
 				throw new InvalidFsmConfigurationException("Initial state has already been set.");
 			}
 
-			_initialConfiguration = configuration;
+			_initialStateConfiguration = configuration;
 		}
 	}
 
 	[ContractClassFor(typeof(FsmBuilder<,>))]
-	public abstract class FsmBuilderContract<T1,T2> : FsmBuilder<T1,T2> 
-		where T1 : struct 
-		where T2 : struct
+	public abstract class FsmBuilderContract<T1,T2> : FsmBuilder<T1,T2>
+		where T1 : struct, IComparable, IConvertible, IFormattable
+		where T2 : struct, IComparable, IConvertible, IFormattable
 	{
 		public override StateMachine<T1, T2> CreateStateMachine() {
 			Contract.Ensures(Contract.Result<StateMachine<T1, T2>>() != null);

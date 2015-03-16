@@ -21,6 +21,8 @@ namespace GenericFSM
 			private readonly Dictionary<int, CommandConfiguration> _commandConfigurations =
 				new Dictionary<int, CommandConfiguration>();
 
+			private StateMachine<TState, TCommand>.StateObject _cachedStateObject;
+
 			#endregion
 
 			#region Contructor
@@ -57,13 +59,15 @@ namespace GenericFSM
 				return _fsmBuilder;
 			}
 
-			[Pure]
 			internal StateMachine<TState, TCommand>.StateObject CreateState() {
 				Contract.Ensures(Contract.Result<StateMachine<TState, TCommand>.StateObject>() != null);
 
-				var stateObject = new StateMachine<TState, TCommand>.StateObject(_state, _enteringAction, _exitingAction);
-				stateObject.FillCommands(_commandConfigurations.Select(command => command.Value.CreateCommandObject()));
-				return stateObject;
+				if (_cachedStateObject == null) {
+					var stateObject = new StateMachine<TState, TCommand>.StateObject(_state, _enteringAction, _exitingAction);
+					stateObject.FillCommands(_commandConfigurations.Select(command => command.Value.CreateCommandObject()));
+					_cachedStateObject = stateObject;
+				}
+				return _cachedStateObject;
 			}
 
 			#endregion

@@ -88,6 +88,7 @@
     <Compile Include="Configuration\CommandObject.cs" />
     <Compile Include="Configuration\StateObject.cs" />
     <Compile Include="Configuration\StateConfiguration.cs" />
+    <Compile Include="Exceptions\CommandNotSupportedException.cs" />
     <Compile Include="Exceptions\CommandRegistrationException.cs" />
     <Compile Include="Exceptions\InvalidCommandTypeException.cs" />
     <Compile Include="Exceptions\InvalidFsmConfigurationException.cs" />

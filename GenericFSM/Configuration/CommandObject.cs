@@ -26,15 +26,34 @@ namespace GenericFSM
 				_targetState = targetState;
 			}
 
+			[Pure]
 			public TCommand Command { get { return _command; } }
-			public StateObject TargetState { get { return _targetState; } }
+			
+			public StateObject TargetState {
+				get {
+					Contract.Ensures(Contract.Result<StateObject>() != null);
+					return _targetState;
+				}
+			}
 
 			public override int GetHashCode() {
 				return GenericFSM.Command.GetHashCode(_command, _guardCondition);
 			}
 
+			[Pure]
+			internal bool CheckGuard() {
+				return _guardCondition == null || _guardCondition();
+			}
+
 			public static implicit operator TCommand(CommandObject commandObject) {
+				Contract.Requires<ArgumentNullException>(commandObject != null);
+
 				return commandObject.Command;
+			}
+
+			[ContractInvariantMethod]
+			private void ContractInvariants() {
+				Contract.Invariant(_targetState != null);
 			}
 		}
 	}
