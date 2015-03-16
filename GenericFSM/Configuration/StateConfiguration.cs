@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading;
 using GenericFSM.Exceptions;
 
 namespace GenericFSM
@@ -13,14 +14,13 @@ namespace GenericFSM
 		{
 			#region Fields
 
+			private readonly object _syncRoot = new object();
 			private readonly FsmBuilder<TState, TCommand> _fsmBuilder;
 			private readonly TState _state;
 			private Action _enteringAction;
 			private Action _exitingAction;
-
 			private readonly Dictionary<int, CommandConfiguration> _commandConfigurations =
 				new Dictionary<int, CommandConfiguration>();
-
 			private StateMachine<TState, TCommand>.StateObject _cachedStateObject;
 
 			#endregion
@@ -61,11 +61,9 @@ namespace GenericFSM
 
 			internal StateMachine<TState, TCommand>.StateObject CreateState() {
 				Contract.Ensures(Contract.Result<StateMachine<TState, TCommand>.StateObject>() != null);
-
 				if (_cachedStateObject == null) {
-					var stateObject = new StateMachine<TState, TCommand>.StateObject(_state, _enteringAction, _exitingAction);
-					stateObject.FillCommands(_commandConfigurations.Select(command => command.Value.CreateCommandObject()));
-					_cachedStateObject = stateObject;
+					_cachedStateObject = new StateMachine<TState, TCommand>.StateObject(_state, _enteringAction, _exitingAction);
+					_cachedStateObject.FillCommands(_commandConfigurations.Select(command => command.Value.CreateCommandObject()));
 				}
 				return _cachedStateObject;
 			}

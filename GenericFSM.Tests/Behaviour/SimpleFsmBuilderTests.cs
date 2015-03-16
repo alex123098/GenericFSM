@@ -83,8 +83,8 @@ namespace GenericFSM.Tests.Behaviour
 		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red, TrafficLightState.Yellow)]
 		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Yellow, TrafficLightState.Red)]
 		[InlineData(TrafficLightState.Green, TrafficLightCommand.Reset, TrafficLightState.Red, TrafficLightState.Yellow)]
-		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red, TrafficLightState.Yellow)]
-		[InlineData(TrafficLightState.Green, TrafficLightCommand.SwitchNext, TrafficLightState.Red, TrafficLightState.Yellow)]
+		[InlineData(TrafficLightState.Yellow, TrafficLightCommand.SwitchNext, TrafficLightState.Green, TrafficLightState.Red)]
+		[InlineData(TrafficLightState.Red, TrafficLightCommand.Reset, TrafficLightState.Red, TrafficLightState.Green)]
 		public void StateMachineConfiguredForTwoStatesWithGuardedCommandsWillSelectCorrectFinalState(
 			TrafficLightState initialState, 
 			TrafficLightCommand command,
