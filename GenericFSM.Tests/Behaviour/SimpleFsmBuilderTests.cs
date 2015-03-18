@@ -1,4 +1,5 @@
-﻿using GenericFSM.Exceptions;
+﻿using System;
+using GenericFSM.Exceptions;
 using GenericFSM.Machines;
 using GenericFSM.Tests.Infrastructure;
 using Moq;
@@ -95,9 +96,9 @@ namespace GenericFSM.Tests.Behaviour
 			stateMachineBuilder
 				.FromState(initialState)
 				.AsInitialState()
-				.OnCommand(command, () => false)
+				.OnCommand(command, ctx => false)
 				.SetState(stateToSkip)
-				.OnCommand(command, () => true)
+				.OnCommand(command, ctx => true)
 				.SetState(stateToSet);
 			var stateMachine = stateMachineBuilder.CreateStateMachine(true);
 
@@ -105,6 +106,77 @@ namespace GenericFSM.Tests.Behaviour
 			stateMachine.TriggerCommand(command);
 
 			Assert.Equal(stateToSet, stateMachine.CurrentState);
+		}
+
+		[Fact]
+		public void StateMachineConfiguredForThreeStatesWithTwoCommands() {
+			var stateMachineBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
+			stateMachineBuilder
+				.FromState(TrafficLightState.Green)
+				.AsInitialState()
+				.OnCommand(TrafficLightCommand.SwitchNext)
+				.SetState(TrafficLightState.Yellow)
+				.OnCommand(TrafficLightCommand.Reset)
+				.SetState(TrafficLightState.Green);
+			stateMachineBuilder
+				.FromState(TrafficLightState.Yellow)
+				.OnCommand(TrafficLightCommand.SwitchNext, ctx => ctx.PreviousState == TrafficLightState.Green)
+				.SetState(TrafficLightState.Red)
+				.OnCommand(TrafficLightCommand.SwitchNext, ctx => ctx.PreviousState == TrafficLightState.Red)
+				.SetState(TrafficLightState.Green)
+				.OnCommand(TrafficLightCommand.Reset)
+				.SetState(TrafficLightState.Green);
+			stateMachineBuilder
+				.FromState(TrafficLightState.Red)
+				.OnCommand(TrafficLightCommand.SwitchNext)
+				.SetState(TrafficLightState.Yellow)
+				.OnCommand(TrafficLightCommand.Reset)
+				.SetState(TrafficLightState.Green);
+
+			var stateMachine = stateMachineBuilder.CreateStateMachine(true);
+
+			Assert.Equal(TrafficLightState.Green, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(TrafficLightCommand.SwitchNext);
+			Assert.Equal(TrafficLightState.Yellow, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(TrafficLightCommand.SwitchNext);
+			Assert.Equal(TrafficLightState.Red, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(TrafficLightCommand.SwitchNext);
+			Assert.Equal(TrafficLightState.Yellow, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(TrafficLightCommand.SwitchNext);
+			Assert.Equal(TrafficLightState.Green, stateMachine.CurrentState);
+			stateMachine.TriggerCommand(TrafficLightCommand.SwitchNext);
+			stateMachine.TriggerCommand(TrafficLightCommand.Reset);
+			Assert.Equal(TrafficLightState.Green, stateMachine.CurrentState);
+		}
+
+		[Fact]
+		public void UserWillBeAbleToProvideTheExecutionData() {
+			const string data = "sample data";
+			Action<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext> action =
+				ctx => {
+					var stringData = Assert.IsAssignableFrom<string>(ctx.Data);
+					Assert.Equal(data, stringData);
+					
+				};
+			Func<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext, bool> guard =
+				ctx => {
+					var stringData = Assert.IsAssignableFrom<string>(ctx.Data);
+					Assert.Equal(data, stringData);
+					return true;
+				};
+			var stateMachineBuilder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
+			stateMachineBuilder
+				.FromState(TrafficLightState.Green)
+				.AsInitialState()
+				.WithEnteringAction(action)
+				.WithExitingAction(action)
+				.OnCommand(TrafficLightCommand.SwitchNext, guard)
+				.SetState(TrafficLightState.Yellow);
+
+			var stateMachine = stateMachineBuilder.CreateStateMachine();
+			stateMachine.SetData(data);
+			stateMachine.Start();
+			stateMachine.TriggerCommand(TrafficLightCommand.SwitchNext);
 		}
 	}
 }

@@ -5,7 +5,7 @@ namespace GenericFSM
 {
 	public static class Command
 	{
-		public static int GetHashCode<T>(T command, Func<bool> guardCondition = null) where T : struct {
+		public static int GetHashCode<T>(T command, Delegate guardCondition = null) where T : struct {
 			return command.GetHashCode() + (guardCondition != null ? guardCondition.Method.GetHashCode() * 11 : 0);
 		}
 	}
@@ -15,10 +15,10 @@ namespace GenericFSM
 		public class CommandObject
 		{
 			private readonly TCommand _command;
-			private readonly Func<bool> _guardCondition;
+			private readonly Func<StateMachineContext, bool> _guardCondition;
 			private readonly StateObject _targetState;
 
-			internal CommandObject(TCommand command, Func<bool> guardCondition, StateObject targetState) {
+			internal CommandObject(TCommand command, Func<StateMachineContext, bool> guardCondition, StateObject targetState) {
 				Contract.Requires<ArgumentNullException>(targetState != null);
 
 				_command = command;
@@ -41,14 +41,18 @@ namespace GenericFSM
 			}
 
 			[Pure]
-			internal bool CheckGuard() {
-				return _guardCondition == null || _guardCondition();
+			internal bool CheckGuard(StateMachineContext ctx) {
+				return _guardCondition == null || _guardCondition(ctx);
 			}
 
 			public static implicit operator TCommand(CommandObject commandObject) {
 				Contract.Requires<ArgumentNullException>(commandObject != null);
 
 				return commandObject.Command;
+			}
+
+			public override string ToString() {
+				return string.Format("{{Command: {0}, State: {1}}}", _command, _targetState.State);
 			}
 
 			[ContractInvariantMethod]

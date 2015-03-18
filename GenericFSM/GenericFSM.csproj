@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="Configuration\CommandConfiguration.cs" />
     <Compile Include="Configuration\CommandObject.cs" />
+    <Compile Include="Configuration\StateMachineContext.cs" />
     <Compile Include="Configuration\StateObject.cs" />
     <Compile Include="Configuration\StateConfiguration.cs" />
     <Compile Include="Exceptions\CommandNotSupportedException.cs" />

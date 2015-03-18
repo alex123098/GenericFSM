@@ -38,7 +38,7 @@ namespace GenericFSM.Tests.Unit
 			var enteringInvoked = false;
 			var initialState = new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
 				TrafficLightState.Green,
-				() => { enteringInvoked = true; },
+				ctx => { enteringInvoked = true; },
 				null);
 			var stateMachine = new SimplePassiveStateMachine<TrafficLightState, TrafficLightCommand>(
 				initialState,
@@ -94,7 +94,7 @@ namespace GenericFSM.Tests.Unit
 				null,
 				null);
 			var guardInvoked = false;
-			Func<bool> guardCondition = () => {
+			Func<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext, bool> guardCondition = ctx => {
 				guardInvoked = true;
 				return true;
 			};
@@ -133,7 +133,7 @@ namespace GenericFSM.Tests.Unit
 			var initialState = new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
 				TrafficLightState.Green,
 				null,
-				() => { exitingInvoked = true; });
+				ctx => { exitingInvoked = true; });
 			var finalState = new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
 				TrafficLightState.Yellow,
 				null,
@@ -156,11 +156,11 @@ namespace GenericFSM.Tests.Unit
 		[Fact]
 		public void TriggerCommand_GuardConditionShouldInvokeAfterExitingFromCurrentState() {
 			var guardInvoked = false;
-			Func<bool> guardCondition = () => guardInvoked = true;
+			Func<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext, bool> guardCondition = ctx => guardInvoked = true;
 			var initialState = new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
 				TrafficLightState.Green,
 				null,
-				() => { throw new Exception(); });
+				ctx => { throw new Exception(); });
 			var finalState = new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
 				TrafficLightState.Yellow,
 				null,
@@ -226,7 +226,7 @@ namespace GenericFSM.Tests.Unit
 			initialState.FillCommands(
 				new StateMachine<TrafficLightState, TrafficLightCommand>.CommandObject(
 					TrafficLightCommand.SwitchNext, 
-					() => false,
+					ctx => false,
 					endState).MakeEnumerable());
 			var stateMachine = new SimplePassiveStateMachine<TrafficLightState, TrafficLightCommand>(
 				initialState,

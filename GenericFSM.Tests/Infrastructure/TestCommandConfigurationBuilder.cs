@@ -7,12 +7,12 @@ namespace GenericFSM.Tests.Infrastructure
 		where TCommand : struct, IComparable, IConvertible, IFormattable
 	{
 		private readonly TestStateConfigurationBuilder<TState, TCommand> _stateConfigurationBuilder = new TestStateConfigurationBuilder<TState, TCommand>();
-		private Func<bool> _guardCondition;
+		private Func<StateMachine<TState, TCommand>.StateMachineContext, bool> _guardCondition;
 		private TCommand _command;
 
 		internal TestStateConfigurationBuilder<TState, TCommand> State { get { return _stateConfigurationBuilder; } }
 
-		internal TestCommandConfigurationBuilder<TState, TCommand> WithGuard(Func<bool> guard) {
+		internal TestCommandConfigurationBuilder<TState, TCommand> WithGuard(Func<StateMachine<TState, TCommand>.StateMachineContext, bool> guard) {
 			_guardCondition = guard;
 			return this;
 		}

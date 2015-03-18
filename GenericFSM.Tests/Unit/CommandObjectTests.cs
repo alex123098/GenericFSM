@@ -20,5 +20,25 @@ namespace GenericFSM.Tests.Unit
 
 			Assert.Equal(command, commandObject);
 		}
+
+		[Theory]
+		[InlineData(TrafficLightCommand.Reset, TrafficLightState.Green)]
+		[InlineData(TrafficLightCommand.Reset, TrafficLightState.Red)]
+		[InlineData(TrafficLightCommand.Reset, TrafficLightState.Yellow)]
+		[InlineData(TrafficLightCommand.SwitchNext, TrafficLightState.Green)]
+		[InlineData(TrafficLightCommand.SwitchNext, TrafficLightState.Red)]
+		[InlineData(TrafficLightCommand.SwitchNext, TrafficLightState.Yellow)]
+		public void ToString_WillReturnCorrectStringResult(TrafficLightCommand command, TrafficLightState state) {
+			var commandObject = new StateMachine<TrafficLightState, TrafficLightCommand>.CommandObject(
+				command,
+				null,
+				new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
+					state,
+					null,
+					null));
+
+			var expected = string.Format("{{Command: {0}, State: {1}}}", command, state);
+			Assert.Equal(expected, commandObject.ToString());
+		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Threading;
 using GenericFSM.Exceptions;
 
 namespace GenericFSM
@@ -14,11 +13,10 @@ namespace GenericFSM
 		{
 			#region Fields
 
-			private readonly object _syncRoot = new object();
 			private readonly FsmBuilder<TState, TCommand> _fsmBuilder;
 			private readonly TState _state;
-			private Action _enteringAction;
-			private Action _exitingAction;
+			private Action<StateMachine<TState, TCommand>.StateMachineContext> _enteringAction;
+			private Action<StateMachine<TState, TCommand>.StateMachineContext> _exitingAction;
 			private readonly Dictionary<int, CommandConfiguration> _commandConfigurations =
 				new Dictionary<int, CommandConfiguration>();
 			private StateMachine<TState, TCommand>.StateObject _cachedStateObject;
@@ -43,12 +41,12 @@ namespace GenericFSM
 			}
 
 			[Pure]
-			internal Action GetEnteringAction() {
+			internal Action<StateMachine<TState, TCommand>.StateMachineContext> GetEnteringAction() {
 				return _enteringAction;
 			}
 
 			[Pure]
-			internal Action GetExitingAction() {
+			internal Action<StateMachine<TState, TCommand>.StateMachineContext> GetExitingAction() {
 				return _exitingAction;
 			}
 
@@ -79,7 +77,7 @@ namespace GenericFSM
 				return this;
 			}
 
-			public StateConfiguration WithExitingAction(Action exitingAction) {
+			public StateConfiguration WithExitingAction(Action<StateMachine<TState, TCommand>.StateMachineContext> exitingAction) {
 				Contract.Requires<ArgumentNullException>(exitingAction != null);
 				Contract.Ensures(Contract.Result<StateConfiguration>() != null);
 
@@ -87,7 +85,7 @@ namespace GenericFSM
 				return this;
 			}
 
-			public StateConfiguration WithEnteringAction(Action enteringAction) {
+			public StateConfiguration WithEnteringAction(Action<StateMachine<TState, TCommand>.StateMachineContext> enteringAction) {
 				Contract.Requires<ArgumentNullException>(enteringAction != null);
 				Contract.Ensures(Contract.Result<StateConfiguration>() != null);
 
@@ -107,7 +105,7 @@ namespace GenericFSM
 				return commandConfig;
 			}
 
-			public CommandConfiguration OnCommand(TCommand command, Func<bool> guardCondition) {
+			public CommandConfiguration OnCommand(TCommand command, Func<StateMachine<TState, TCommand>.StateMachineContext, bool> guardCondition) {
 				Contract.Requires<ArgumentNullException>(guardCondition != null);
 				Contract.Ensures(Contract.Result<CommandConfiguration>() != null);
 
@@ -132,7 +130,7 @@ namespace GenericFSM
 
 			#region Private methods
 
-			private int CalculateCommandKey(TCommand command, Func<bool> guard = null) {
+			private int CalculateCommandKey(TCommand command, Func<StateMachine<TState, TCommand>.StateMachineContext, bool> guard = null) {
 				return Command.GetHashCode(command, guard);
 			}
 

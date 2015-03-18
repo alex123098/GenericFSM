@@ -11,7 +11,7 @@ namespace GenericFSM
 			#region Fields
 
 			private readonly TCommand _command;
-			private readonly Func<bool> _guardCondition;
+			private readonly Func<StateMachine<TState, TCommand>.StateMachineContext, bool> _guardCondition;
 			private readonly StateConfiguration _fromStateConfiguration;
 			private StateConfiguration _targetStateConfiguration;
 			private StateMachine<TState, TCommand>.CommandObject _cachedCommandObject;
@@ -27,7 +27,10 @@ namespace GenericFSM
 				_command = command;
 			}
 
-			public CommandConfiguration(StateConfiguration fromStateConfiguration, TCommand command, Func<bool> guardCondition)
+			public CommandConfiguration(
+				StateConfiguration fromStateConfiguration,
+				TCommand command, Func<StateMachine<TState, TCommand>.StateMachineContext, bool> guardCondition)
+
 				: this(fromStateConfiguration, command) {
 				Contract.Requires<ArgumentException>(fromStateConfiguration != null);
 				Contract.Requires<ArgumentNullException>(guardCondition != null);
@@ -43,7 +46,7 @@ namespace GenericFSM
 				get { return _command; }
 			}
 
-			internal Func<bool> GuardCondition {
+			internal Func<StateMachine<TState, TCommand>.StateMachineContext, bool> GuardCondition {
 				[Pure]
 				get { return _guardCondition; }
 			}

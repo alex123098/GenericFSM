@@ -23,7 +23,7 @@ namespace GenericFSM.Tests.Unit
 		[InlineData(TrafficLightCommand.Reset)]
 		[InlineData(TrafficLightCommand.SwitchNext)]
 		public void Ctor_WillAcceptGuardCondition(TrafficLightCommand command) {
-			Func<bool> guardCondition = () => true;
+			Func<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext, bool> guardCondition = ctx => true;
 			var commandConfig = new TestCommandConfigurationBuilder<TrafficLightState, TrafficLightCommand>()
 				.WithCommand(command)
 				.WithGuard(guardCondition)

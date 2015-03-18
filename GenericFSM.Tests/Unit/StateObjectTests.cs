@@ -18,5 +18,19 @@ namespace GenericFSM.Tests.Unit
 
 			Assert.Equal(state, stateObject);
 		}
+
+		[Theory]
+		[InlineData(TrafficLightState.Green)]
+		[InlineData(TrafficLightState.Red)]
+		[InlineData(TrafficLightState.Yellow)]
+		public void ToString_WillReturnExpectedResult(TrafficLightState state) {
+			var stateObject = new StateMachine<TrafficLightState, TrafficLightCommand>.StateObject(
+				state,
+				null,
+				null);
+
+			var expectedString = string.Format("{{{0}}}", state);
+			Assert.Equal(expectedString, stateObject.ToString());
+		}
 	}
 }

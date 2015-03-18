@@ -50,7 +50,7 @@ namespace GenericFSM.Tests.Unit
 			var stateConfiguration = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>().Build();
 
 			Assert.Null(stateConfiguration.GetEnteringAction());
-			Action enteringAction = () => { };
+			Action<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext> enteringAction = ctx => { };
 			stateConfiguration.WithEnteringAction(enteringAction);
 			
 			Assert.Same(enteringAction, stateConfiguration.GetEnteringAction());
@@ -61,7 +61,7 @@ namespace GenericFSM.Tests.Unit
 			var stateConfiguration = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>().Build();
 
 			Assert.Null(stateConfiguration.GetExitingAction());
-			Action exitingAction = () => { };
+			Action<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext> exitingAction = ctx => { };
 			stateConfiguration.WithExitingAction(exitingAction);
 
 			Assert.Same(exitingAction, stateConfiguration.GetExitingAction());
@@ -82,7 +82,7 @@ namespace GenericFSM.Tests.Unit
 		[Fact]
 		public void OnCommand_CanSpecifyGuardCondition() {
 			var stateConfiguration = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>().Build();
-			Func<bool> guardCondition = () => true;
+			Func<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext, bool> guardCondition = ctx => true;
 
 			var commandConfiguration = stateConfiguration.OnCommand(TrafficLightCommand.Reset, guardCondition);
 
@@ -107,9 +107,9 @@ namespace GenericFSM.Tests.Unit
 		public void OnCommand_WillNotFailIfInvokedManyTimesWithGuardCondition(TrafficLightCommand command) {
 			var stateConfiguration = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>().Build();
 
-			stateConfiguration.OnCommand(command, () => true);
+			stateConfiguration.OnCommand(command, ctx => true);
 
-			stateConfiguration.OnCommand(command, () => false);
+			stateConfiguration.OnCommand(command, ctx => false);
 		}
 
 		[Theory]
@@ -120,7 +120,7 @@ namespace GenericFSM.Tests.Unit
 
 			stateConfiguration.OnCommand(command);
 
-			Assert.Throws<CommandRegistrationException>(() => stateConfiguration.OnCommand(command, () => true));
+			Assert.Throws<CommandRegistrationException>(() => stateConfiguration.OnCommand(command, ctx => true));
 		}
 
 		[Theory]
@@ -128,7 +128,7 @@ namespace GenericFSM.Tests.Unit
 		[InlineData(TrafficLightCommand.SwitchNext)]
 		public void OnCommand_WillFailIfInvokedForSameCommandWithSameGuardConditionTwice(TrafficLightCommand command) {
 			var stateConfiguration = new TestStateConfigurationBuilder<TrafficLightState, TrafficLightCommand>().Build();
-			Func<bool> guard = () => true;
+			Func<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext, bool> guard = ctx => true;
 
 			stateConfiguration.OnCommand(command, guard);
 
@@ -159,15 +159,18 @@ namespace GenericFSM.Tests.Unit
 				.Build();
 			var enterInvoked = false;
 			var exitInvoked = false;
-			Action enterAction = () => { enterInvoked = true; };
-			Action exitAction = () => { exitInvoked = true; };
+			Action<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext> enterAction = 
+				ctx => { enterInvoked = true; };
+			Action<StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext> exitAction = 
+				ctx => { exitInvoked = true; };
 			
 			var stateObject = stateConfiguration
 				.WithEnteringAction(enterAction)
 				.WithExitingAction(exitAction)
 				.CreateState();
-			stateObject.Enter();
-			stateObject.Exit();
+			var simpleContext = new StateMachine<TrafficLightState, TrafficLightCommand>.StateMachineContext(null, null, null, null);
+			stateObject.Enter(simpleContext);
+			stateObject.Exit(simpleContext);
 
 			Assert.Equal(state, stateObject.State);
 			Assert.True(enterInvoked, "State.Enter() must invoke enter action.");

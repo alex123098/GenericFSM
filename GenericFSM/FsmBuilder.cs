@@ -44,7 +44,7 @@ namespace GenericFSM
 	}
 
 	[ContractClassFor(typeof(FsmBuilder<,>))]
-	public abstract class FsmBuilderContract<T1,T2> : FsmBuilder<T1,T2>
+	internal abstract class FsmBuilderContract<T1,T2> : FsmBuilder<T1,T2>
 		where T1 : struct, IComparable, IConvertible, IFormattable
 		where T2 : struct, IComparable, IConvertible, IFormattable
 	{

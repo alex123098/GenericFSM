@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Net;
 
 namespace GenericFSM
 {
@@ -11,12 +10,13 @@ namespace GenericFSM
 		public class StateObject
 		{
 			private readonly TState _state;
-			private readonly Action _enterAction;
-			private readonly Action _exitAction;
+			private readonly Action<StateMachineContext> _enterAction;
+			private readonly Action<StateMachineContext> _exitAction;
 			private readonly List<CommandObject> _commands = new List<CommandObject>(); 
 
 			public TState State { get { return _state; } }
 
+			[Pure]
 			public IEnumerable<CommandObject> Commands {
 				get {
 					Contract.Ensures(Contract.Result<IEnumerable<CommandObject>>() != null);
@@ -24,7 +24,7 @@ namespace GenericFSM
 				}
 			}
 
-			internal StateObject(TState state, Action enterAction, Action exitAction) {
+			internal StateObject(TState state, Action<StateMachineContext> enterAction, Action<StateMachineContext> exitAction) {
 				_state = state;
 				_enterAction = enterAction;
 				_exitAction = exitAction;
@@ -35,25 +35,30 @@ namespace GenericFSM
 				_commands.AddRange(commands);
 			}
 
-			public void Enter() {
+			public void Enter(StateMachineContext ctx) {
 				if (_enterAction != null) {
-					_enterAction();
+					_enterAction(ctx);
 				}
 			}
 
-			public void Exit() {
+			public void Exit(StateMachineContext ctx) {
 				if (_exitAction != null) {
-					_exitAction();
+					_exitAction(ctx);
 				}
 			}
 
-			public CommandObject FindCommand(TCommand command) {
-				return _commands.FirstOrDefault(cmd => cmd.Command.CompareTo(command) == 0 && cmd.CheckGuard());
+			public CommandObject FindCommand(TCommand command, StateMachineContext ctx) {
+				return _commands.FirstOrDefault(
+					cmd => cmd.Command.CompareTo(command) == 0 && cmd.CheckGuard(ctx));
 			}
 
 			public static implicit operator TState(StateObject stateObject) {
 				Contract.Requires<ArgumentNullException>(stateObject != null);
 				return stateObject.State;
+			}
+
+			public override string ToString() {
+				return string.Format("{{{0}}}", _state);
 			}
 
 			[ContractInvariantMethod]

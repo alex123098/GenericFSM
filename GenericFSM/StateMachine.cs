@@ -9,6 +9,7 @@ namespace GenericFSM
 	{
 		protected StateObject _currentState;
 		protected bool _started;
+		protected object _executionData;
 
 		public virtual void Start() {
 			if (_started) {
@@ -28,6 +29,10 @@ namespace GenericFSM
 				}
 				return _currentState;
 			}
+		}
+
+		public virtual void SetData(object data) {
+			_executionData = data;
 		}
 
 		protected abstract void DoStart();

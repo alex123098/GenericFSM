@@ -11,7 +11,7 @@ namespace GenericFSM.Machines
 		where TCommand : struct, IComparable, IConvertible, IFormattable
 	{
 		private readonly StateObject _initialState;
-		
+		private TState? _previousState;
 
 		public SimplePassiveStateMachine(StateObject initialState, IEnumerable<StateObject> states) {
 			Contract.Requires(initialState != null);
@@ -28,12 +28,12 @@ namespace GenericFSM.Machines
 		}
 
 		public override void TriggerCommand(TCommand command) {
-			_currentState.Exit();
-			var commandObject = _initialState.FindCommand(command);
+			_currentState.Exit(CreateContext(command));
+			var commandObject = _currentState.FindCommand(command, CreateContext(command));
 			if (commandObject == null) {
 				throw new CommandNotSupportedException();
 			}
-			EnterState(commandObject.TargetState);
+			EnterState(commandObject.TargetState, command);
 		}
 
 		[ContractInvariantMethod]
@@ -41,11 +41,18 @@ namespace GenericFSM.Machines
 			Contract.Invariant(_initialState != null);
 		}
 
-		private void EnterState(StateObject state) {
+		private StateMachineContext CreateContext(TCommand? command) {
+			return new StateMachineContext(command, _currentState, _previousState, _executionData);
+		}
+
+		private void EnterState(StateObject state, TCommand? command = null) {
 			Contract.Requires<ArgumentNullException>(state != null);
 
+			if (_currentState != null) {
+				_previousState = _currentState;
+			}
 			_currentState = state;
-			_currentState.Enter();
+			_currentState.Enter(CreateContext(command));
 		}
 	}
 }
