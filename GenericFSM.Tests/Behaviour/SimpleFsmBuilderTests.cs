@@ -31,7 +31,7 @@ namespace GenericFSM.Tests.Behaviour
 		}
 
 		[Fact]
-		public void CreateStateMachine_WillCanCreateAlreadyStartedStateMachine() {
+		public void CreateStateMachine_WithArgumentEqualToTrue_CreatesStartedStateMachine() {
 			var builder = new SimpleFsmBuilder<TrafficLightState, TrafficLightCommand>();
 			builder.FromState(TrafficLightState.Green).AsInitialState();
 
@@ -41,7 +41,7 @@ namespace GenericFSM.Tests.Behaviour
 		}
 
 		[Fact]
-		public void CreateStateMachine_WithStartedFlagWillInvokeStartMethod() {
+		public void CreateStateMachine_WithStartedFlag_WillInvokeStartMethod() {
 			var stateMachineMock = Mock.Of<StateMachine<TrafficLightState, TrafficLightCommand>>();
 			var builder = Mock.Of<FsmBuilder<TrafficLightState, TrafficLightCommand>>(
 				b => b.CreateStateMachine() == stateMachineMock &&

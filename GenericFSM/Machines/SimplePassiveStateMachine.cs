@@ -28,8 +28,9 @@ namespace GenericFSM.Machines
 		}
 
 		public override void TriggerCommand(TCommand command) {
-			_currentState.Exit(CreateContext(command));
-			var commandObject = _currentState.FindCommand(command, CreateContext(command));
+		    var ctx = CreateContext(command);
+            _currentState.Exit(ctx);
+            var commandObject = _currentState.FindCommand(command, ctx);
 			if (commandObject == null) {
 				throw new CommandNotSupportedException();
 			}
