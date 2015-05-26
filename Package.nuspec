@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>GenericFSM</id>
+    <version>1.0.0</version>
+    <authors>Aleksei Zaichenko</authors>
+    <owners>Aleksei Zaichenko</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>State machine builder</description>
+    <releaseNotes>Added support for non-threadsafe passive state machine</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>State machine</tags>
+  </metadata>
+</package>
