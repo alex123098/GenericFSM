@@ -43,6 +43,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Version.cs">
+      <Link>Version.cs</Link>
+    </Compile>
     <Compile Include="Behaviour\SimpleFsmBuilderTests.cs" />
     <Compile Include="Infrastructure\Command.cs" />
     <Compile Include="Infrastructure\EnumerableExtensions.cs" />

@@ -122,6 +122,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Version.cs">
+      <Link>Version.cs</Link>
+    </Compile>
     <Compile Include="Configuration\CommandConfiguration.cs" />
     <Compile Include="Configuration\CommandObject.cs" />
     <Compile Include="Configuration\StateMachineContext.cs" />

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>GenericFSM</id>
-    <version>1.0.0</version>
+    <version>0.0.1</version>
     <authors>Aleksei Zaichenko</authors>
     <owners>Aleksei Zaichenko</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
